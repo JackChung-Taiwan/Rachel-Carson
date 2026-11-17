@@ -41,6 +41,13 @@ export class GameUI {
 
   constructor(private readonly h: UIHandlers, private readonly touch: boolean) {
     document.body.classList.toggle('is-touch', touch);
+    if (touch) {
+      const panel = $('#mission-panel');
+      const hud = $('#hud');
+      new ResizeObserver(() => {
+        hud.style.setProperty('--mission-panel-height', `${panel.offsetHeight}px`);
+      }).observe(panel);
+    }
     // 圖示
     document.querySelectorAll<HTMLElement>('[data-icon]').forEach((el) => {
       const name = el.dataset.icon as keyof typeof ICONS;

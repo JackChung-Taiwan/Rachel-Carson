@@ -344,15 +344,18 @@ kbd {
 }
 /* 手機：導覽對話移到上方，避免與搖桿重疊；任務面板保持可見 */
 body.is-touch #guide-dialog {
-  top: calc(156px + var(--safe-top)); bottom: auto; padding: 12px 14px; gap: 12px; width: calc(100% - 20px);
+  top: calc(var(--mission-panel-height, 196px) + 22px + var(--safe-top));
+  bottom: auto; padding: 12px 14px; gap: 12px; width: calc(100% - 20px);
+  max-height: max(70px, calc(100dvh - var(--mission-panel-height, 196px) - 212px - var(--safe-top) - var(--safe-bottom)));
+  overflow: auto;
 }
 body.is-touch .guide-avatar:not(.small) { width: 58px; height: 58px; }
 body.is-touch .guide-text { font-size: 1rem; line-height: 1.55; margin: 4px 0 8px; }
-body.is-touch #guide-dialog.blocking { top: auto; bottom: calc(24px + var(--safe-bottom)); }
+body.is-touch #guide-dialog.blocking { top: auto; bottom: calc(24px + var(--safe-bottom)); max-height: none; }
 body.is-touch #lock-hint { display: none !important; }
 body.is-touch #interact-prompt { top: calc(50% + 40px); }
 @media (orientation: landscape) and (max-height: 520px) {
-  body.is-touch #guide-dialog { top: calc(10px + var(--safe-top)); left: auto; right: 74px; transform: none; width: min(460px, 52%); animation: none; }
+  body.is-touch #guide-dialog { top: calc(10px + var(--safe-top)); left: auto; right: 74px; transform: none; width: min(460px, 52%); max-height: none; animation: none; }
   .modal { place-items: start center; }
   #joystick { width: 130px; height: 130px; }
 }
@@ -362,3 +365,9 @@ body.is-touch #interact-prompt { top: calc(50% + 40px); }
 #card-choices button { justify-content: flex-start; text-align: left; white-space: normal; }
 #card-choices button[aria-pressed="true"] { border-color: var(--teal-2); background: rgba(53, 214, 199, 0.22); }
 #card-feedback:not(:empty) { margin-top: 8px; font-size: 1rem; }
+@media (max-width: 355px) {
+  #joystick { left: calc(12px + var(--safe-left)); }
+  #touch-buttons { gap: 8px; right: calc(14px + var(--safe-right)); }
+  .touch-btn { width: 56px; height: 56px; }
+  .touch-btn-main { width: 68px; height: 68px; }
+}
