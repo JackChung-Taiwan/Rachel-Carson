@@ -204,3 +204,13 @@ npm run test:e2e                     # 需先安裝 Playwright 瀏覽器：npx p
 - [NOAA：廢棄漁具與生物纏繞](https://marinedebris.noaa.gov/what-marine-debris/derelict-fishing-gear)
 - [NOAA：珊瑚白化](https://oceanservice.noaa.gov/facts/coral_bleach.html)
 - [NOAA：海草與船隻傷害](https://floridakeys.noaa.gov/about/faqs.html)
+
+
+## 完成任務後的海洋生物觀察站
+
+完成五項任務後，可以在結尾選擇「加入海洋生物」，或繼續探索後點魚形按鈕、在選單開啟觀察站。電腦也可以按 B 開啟。
+加入金色魚群、銀藍色魚群、魟魚或大型石斑魚，生物會出現在玩家前方，關閉面板即可觀察。
+石斑魚會尋找新增的小魚，魚群會避開掠食者；捕食成功時小魚消失並顯示水圈，面板記錄捕食次數。
+捕食是簡化的虛擬食物網活動。最多同時新增 72 隻小魚、3 隻魟魚與 2 隻石斑魚，吃掉的小魚可再次補充。
+重新探索或回到首頁會清除新增生物與捕食紀錄。切換畫質保留新增生物。
+實作位於 `src/scene/BonusHabitat.ts`，小魚使用 InstancedMesh，重用現有魚與魟魚幾何。

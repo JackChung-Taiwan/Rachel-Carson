@@ -10,9 +10,10 @@ import { DIALOGUE } from '../data/dialogue';
 import { WORLD } from '../data/worldLayout';
 import { isTouchDevice, loadQuality, saveQuality, type QualityLevel } from './Quality';
 import { FpsMeter } from './FpsMeter';
+import type { BonusSpecies } from '../scene/BonusHabitat';
 import { Ambience } from '../audio/Ambience';
 
-export type GameState = 'home' | 'intro' | 'playing' | 'card' | 'paused' | 'ended';
+export type GameState = 'home' | 'intro' | 'playing' | 'card' | 'paused' | 'ended' | 'habitat';
 
 /**
  * 遊戲主流程：狀態機、主迴圈、輸入整合、任務與介面串接。
@@ -57,6 +58,9 @@ export class Game {
           this.startIntro();
         },
         onAudioToggle: () => this.toggleAudio(),
+        onHabitat: () => this.openHabitat(),
+        onHabitatClose: () => this.closeHabitat(),
+        onAddLife: (species) => this.addLife(species),
         onCardAction: (id) => this.cardAction(id),
         onCardClose: () => this.closeCard(),
         onRestart: () => this.restart(),
@@ -129,6 +133,7 @@ export class Game {
   // ---------------- 輸入 ----------------
   private bindInput(canvas: HTMLCanvasElement): void {
     window.addEventListener('keydown', (e) => {
+      if (e.code === 'KeyB' && !e.repeat && !e.ctrlKey && !e.altKey && !e.metaKey) this.openHabitat();
       if (e.code === 'KeyM' && !e.repeat && !e.ctrlKey && !e.altKey && !e.metaKey) this.toggleAudio();
       if (e.code === 'KeyF' && !e.repeat) {
         if (this.state === 'playing') this.tryInteract();
@@ -137,7 +142,8 @@ export class Game {
         }
       }
       if (e.code === 'Escape') {
-        if (this.state === 'card') this.closeCard();
+        if (this.state === 'habitat') this.closeHabitat();
+        else if (this.state === 'card') this.closeCard();
         else if (this.ui.modalOpen) this.ui.closeModals();
         else if (this.state === 'playing') this.pause();
         else if (this.state === 'paused' && performance.now() - this.pausedAt > 400) this.resume();
@@ -292,7 +298,8 @@ export class Game {
     this.player.enabled = true;
     this.touch.setVisible(this.isTouch);
     this.requestLock();
-    this.ui.showDialog(DIALOGUE.freeExplore, { autoHideMs: 9000 });
+    this.ui.showDialog('觀察站已解鎖！點右側的魚形按鈕（電腦也可按 B），加入魚群、魟魚或大型石斑魚，看看牠們怎麼互動。', { autoHideMs: 9000 });
+    this.ui.setHabitatUnlocked(true);
   }
 
   restart(): void {
@@ -305,6 +312,9 @@ export class Game {
     this.missions.reset();
     this.ocean.bottle.reset();
     this.ocean.conservation.reset();
+    this.ocean.habitat.reset();
+    this.ui.showHabitat(false);
+    this.ui.setHabitatUnlocked(false);
     this.ocean.turtle.setPaused(false);
     this.touch.setVisible(false);
     this.ui.showHUD(true);
@@ -346,9 +356,47 @@ export class Game {
     this.missions.reset();
     this.ocean.bottle.reset();
     this.ocean.conservation.reset();
+    this.ocean.habitat.reset();
+    this.ui.showHabitat(false);
+    this.ui.setHabitatUnlocked(false);
     this.player.enabled = false;
     this.state = 'home';
     this.ui.showHome(true);
+  }
+
+  private openHabitat(): void {
+    if (!this.missions.allCompleted || !['playing', 'ended', 'paused'].includes(this.state)) return;
+    if (this.state === 'ended') {
+      this.ui.showEnd(false);
+      this.ui.showHUD(true);
+      this.ui.setHabitatUnlocked(true);
+    }
+    this.ui.showPause(false);
+    this.state = 'habitat';
+    this.player.enabled = false;
+    this.player.velocity.set(0, 0, 0);
+    this.releaseLock();
+    this.ui.hideDialog();
+    this.ui.setPrompt(null);
+    this.ui.setTargetMarker({ visible: false });
+    this.touch.setVisible(false);
+    this.ui.renderHabitat(this.ocean.habitat);
+    this.ui.showHabitat(true);
+  }
+
+  private closeHabitat(): void {
+    if (this.state !== 'habitat') return;
+    this.ui.showHabitat(false);
+    this.state = 'playing';
+    this.player.enabled = true;
+    this.touch.setVisible(this.isTouch);
+    this.requestLock();
+  }
+
+  private addLife(species: BonusSpecies): void {
+    if (this.state !== 'habitat' || !this.missions.allCompleted) return;
+    this.ocean.habitat.add(species, this.ocean.camera);
+    this.ui.renderHabitat(this.ocean.habitat);
   }
 
   setQuality(q: QualityLevel): void {
@@ -392,7 +440,8 @@ export class Game {
       }
     }
 
-    this.ocean.update(sdt);
+    this.ocean.update(sdt, this.state === 'playing' || this.state === 'habitat');
+    if (this.missions.allCompleted) this.ui.renderHabitat(this.ocean.habitat);
 
     if (this.state === 'playing') {
       const target = this.interactions.update(cam);

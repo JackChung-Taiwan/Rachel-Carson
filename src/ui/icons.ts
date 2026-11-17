@@ -3,6 +3,7 @@ const svg = (body: string, vb = '0 0 24 24') =>
   `<svg viewBox="${vb}" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
 
 export const ICONS = {
+  fish: svg('<path d="M18 12c-3-7-10-7-15 0 5 7 12 7 15 0Zm0 0 4-4v8l-4-4Z"/><circle cx="7" cy="11" r="1" fill="currentColor"/>'),
   speaker: svg('<path d="M11 5 6 9H3v6h3l5 4V5Zm4 4a4 4 0 0 1 0 6m2-8a7 7 0 0 1 0 10"/>'),
   muted: svg('<path d="M11 5 6 9H3v6h3l5 4V5Zm4 5 5 5m0-5-5 5"/>'),
   net: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 5h18v14H3zM9 5v14m6-14v14M3 10h18M3 14h18"/></svg>',

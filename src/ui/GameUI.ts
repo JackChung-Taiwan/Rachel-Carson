@@ -1,3 +1,4 @@
+import { HABITAT_LIMITS, type BonusHabitat, type BonusSpecies } from '../scene/BonusHabitat';
 import { ICONS, GUIDE_AVATAR_SVG } from './icons';
 import { KNOWLEDGE, type KnowledgeEntry, type KnowledgeId } from '../data/knowledge';
 import { DIALOGUE, EXTENSION_ACTIVITIES, GUIDE_DISCLAIMER } from '../data/dialogue';
@@ -13,6 +14,9 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string, root: ParentNode = 
 export interface UIHandlers {
   onStart: () => void;
   onAudioToggle: () => void;
+  onHabitat: () => void;
+  onHabitatClose: () => void;
+  onAddLife: (species: BonusSpecies) => void;
   onCardAction: (id: KnowledgeId) => void;
   onCardClose: () => void;
   onRestart: () => void;
@@ -38,6 +42,7 @@ export class GameUI {
   private toastTimer = 0;
   private cardId: KnowledgeId | null = null;
   private quality: QualityLevel = 'high';
+  private habitatSummary = '';
   private returnModal: 'home' | 'pause' = 'home';
 
   constructor(private readonly h: UIHandlers, private readonly touch: boolean) {
@@ -57,6 +62,13 @@ export class GameUI {
     document.querySelectorAll<HTMLElement>('.guide-avatar').forEach((el) => (el.innerHTML = GUIDE_AVATAR_SVG));
 
     $('#btn-start').addEventListener('click', () => this.h.onStart());
+    $('#btn-habitat').addEventListener('click', () => this.h.onHabitat());
+    $('#btn-habitat-end').addEventListener('click', () => this.h.onHabitat());
+    $('#btn-habitat-menu').addEventListener('click', () => this.h.onHabitat());
+    $('#btn-habitat-close').addEventListener('click', () => this.h.onHabitatClose());
+    for (const species of ['reef-fish', 'silver-fish', 'ray', 'grouper'] as const) {
+      $(`[data-add-life="${species}"]`).addEventListener('click', () => this.h.onAddLife(species));
+    }
     document.querySelectorAll<HTMLButtonElement>('[data-audio-toggle]').forEach((button) => {
       button.addEventListener('click', () => this.h.onAudioToggle());
     });
@@ -275,6 +287,32 @@ export class GameUI {
   }
 
   // ---------- 結束畫面 / 選單 ----------
+  setHabitatUnlocked(unlocked: boolean): void {
+    $('#btn-habitat').classList.toggle('hidden', !unlocked);
+    $('#btn-habitat-menu').classList.toggle('hidden', !unlocked);
+    if (!unlocked) this.habitatSummary = '';
+  }
+
+  showHabitat(visible: boolean): void {
+    $('#habitat-overlay').classList.toggle('hidden', !visible);
+    if (visible) window.setTimeout(() => $('#btn-habitat-close').focus(), 50);
+  }
+
+  renderHabitat(habitat: BonusHabitat): void {
+    const counts = habitat.counts;
+    const summary = `小魚 ${counts.fish}/${HABITAT_LIMITS.fish} · 魟魚 ${counts.rays}/${HABITAT_LIMITS.rays} · 石斑魚 ${counts.groupers}/${HABITAT_LIMITS.groupers} · 捕食 ${counts.catches} 次`;
+    if (summary === this.habitatSummary) return;
+    this.habitatSummary = summary;
+    $('#habitat-counts').textContent = summary;
+    $('#habitat-live').textContent = counts.catches ? `觀察到 ${counts.catches} 次捕食` : '觀察站已解鎖';
+    document.querySelectorAll<HTMLButtonElement>('[data-add-life]').forEach((button) => {
+      button.disabled = !habitat.canAdd(button.dataset.addLife as BonusSpecies);
+    });
+    $('#habitat-feedback').textContent = counts.fish === 0 && counts.groupers > 0
+      ? '石斑魚正在巡游。加入小魚群，就能觀察覓食行為。'
+      : '魚群會避開石斑魚；被吃到的小魚會從畫面消失。可以隨時加入更多魚群。';
+  }
+
   showEnd(v: boolean): void {
     $('#end-screen').classList.toggle('hidden', !v);
     if (v) window.setTimeout(() => $('#btn-free').focus(), 50);

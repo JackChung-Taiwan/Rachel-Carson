@@ -17,6 +17,7 @@ function createDebugApi(game: Game) {
     progress: () => `${game.missions.completedCount}/${game.missions.total}`,
     missions: () => game.missions.list.map((m) => ({ id: m.id, completed: m.completed })),
     currentTarget: () => game.interactions.current?.id ?? null,
+    habitat: () => game.ocean.habitat.counts,
     recordedSites: () => game.ocean.conservation.entries.filter(({ beacon }) => beacon.visible).map(({ id }) => id),
     bottleVisible: () => game.ocean.bottle.group.visible && !game.ocean.bottle.cleaned,
     teleport: (t: KnowledgeId | 'bottle' | 'start') => game.debugTeleport(t),

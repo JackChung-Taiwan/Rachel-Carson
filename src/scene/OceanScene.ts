@@ -13,6 +13,7 @@ import { SeaLife } from './SeaLife';
 import { Turtle } from './Turtle';
 import { PlasticBottle } from './PlasticBottle';
 import { ConservationSites } from './ConservationSites';
+import { BonusHabitat } from './BonusHabitat';
 import { CleanupEffect } from './CleanupEffect';
 
 /**
@@ -25,6 +26,7 @@ export class OceanScene {
   readonly terrain: SeabedTerrain;
   readonly turtle: Turtle;
   readonly bottle: PlasticBottle;
+  readonly habitat = new BonusHabitat();
   readonly conservation = new ConservationSites();
   readonly cleanupEffect = new CleanupEffect();
   quality: QualitySettings;
@@ -63,7 +65,7 @@ export class OceanScene {
     this.scene.add(this.turtle.group);
     this.bottle = new PlasticBottle();
     this.scene.add(this.bottle.group);
-    this.scene.add(this.cleanupEffect.group, this.conservation.group);
+    this.scene.add(this.cleanupEffect.group, this.conservation.group, this.habitat.group);
 
     this.buildQualityDependent();
     this.resize();
@@ -134,7 +136,7 @@ export class OceanScene {
     return this.sealife.getMainSchoolCenter(out);
   }
 
-  update(dt: number): void {
+  update(dt: number, habitatActive = true): void {
     this.time += dt;
     globalUniforms.uTime.value = this.time;
     this.environment.update(this.camera);
@@ -142,6 +144,7 @@ export class OceanScene {
     this.turtle.update(this.time, dt);
     this.bottle.update(this.time, dt);
     this.cleanupEffect.update(dt);
+    if (habitatActive) this.habitat.update(dt);
   }
 
   render(): void {

@@ -6,7 +6,7 @@ import { patchMaterial } from './shaders/patchMaterial';
 import type { QualitySettings } from '../core/Quality';
 
 /** 程序化魚形：側扁的流線身體 + 尾鰭 + 背鰭，頭朝 +Z。 */
-function fishGeometry(): THREE.BufferGeometry {
+export function fishGeometry(): THREE.BufferGeometry {
   const profile = [
     [0.0, 0.52], [0.05, 0.49], [0.1, 0.4], [0.135, 0.25], [0.14, 0.08], [0.12, -0.1],
     [0.085, -0.26], [0.045, -0.37], [0.02, -0.42], [0.0, -0.43],
@@ -49,7 +49,7 @@ function fishGeometry(): THREE.BufferGeometry {
   return merged;
 }
 
-function mantaGeometry(): THREE.BufferGeometry {
+export function mantaGeometry(): THREE.BufferGeometry {
   const shape = new THREE.Shape();
   shape.moveTo(0, 0.9);
   shape.bezierCurveTo(0.6, 0.85, 1.4, 0.35, 2.2, -0.25);

@@ -47,6 +47,7 @@
         </aside>
         <button id="btn-menu" class="icon-btn glass" aria-label="開啟選單" data-icon="menu"></button>
         <button id="btn-audio" class="icon-btn glass" data-audio-toggle aria-label="海底配樂"></button>
+        <button id="btn-habitat" class="glass hidden" aria-label="開啟海洋生物觀察站" data-icon="fish"><kbd>B</kbd><span id="habitat-live">觀察站已解鎖</span></button>
         <div id="crosshair" aria-hidden="true"></div>
         <div id="target-marker" class="hidden" aria-hidden="true">
           <div class="tm-ring"></div>
@@ -121,6 +122,11 @@
             <p class="end-guide-text"></p>
           </div>
           <section class="end-extension">
+            <h3>海洋生物觀察站已解鎖</h3>
+            <p>加入魚群、魟魚與大型石斑魚，在海底觀察追逐和捕食。</p>
+            <button class="btn btn-primary" id="btn-habitat-end" data-icon="fish">加入海洋生物</button>
+          </section>
+          <section class="end-extension">
             <h3>延伸學習</h3>
             <p class="end-ext-heading"></p>
             <ol class="end-ext-list"></ol>
@@ -129,6 +135,23 @@
             <button class="btn btn-ghost btn-lg" id="btn-restart" data-icon="restart">重新探索</button>
             <button class="btn btn-primary btn-lg" id="btn-free" data-icon="compass">繼續自由探索</button>
           </footer>
+        </article>
+      </div>
+
+      <div id="habitat-overlay" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="habitat-title">
+        <article class="glass card habitat-card">
+          <h2 id="habitat-title">海洋生物觀察站</h2>
+          <p>這是虛擬生態觀察活動。加入生物後，關閉面板就能在前方觀察。</p>
+          <p id="habitat-counts" role="status"></p>
+          <div class="habitat-options">
+            <button class="btn btn-ghost" data-add-life="reef-fish"><b>加入珊瑚礁小魚</b><span>金黃色的小魚群 · 每次最多 12 隻</span></button>
+            <button class="btn btn-ghost" data-add-life="silver-fish"><b>加入銀藍色小魚</b><span>閃亮的小魚群 · 每次最多 12 隻</span></button>
+            <button class="btn btn-ghost" data-add-life="ray"><b>加入魟魚</b><span>慢慢滑翔的海底訪客 · 每次 1 隻</span></button>
+            <button class="btn btn-ghost" data-add-life="grouper"><b>加入大型石斑魚</b><span>會追逐並吃掉小魚 · 每次 1 隻</span></button>
+          </div>
+          <p id="habitat-feedback"></p>
+          <p class="habitat-note">捕食是食物網的一部分。這裡以簡化模型呈現，真實海洋中的生物關係更豐富。</p>
+          <footer class="card-actions"><button id="btn-habitat-close" class="btn btn-primary btn-lg">回到海底觀察</button></footer>
         </article>
       </div>
 
@@ -141,6 +164,7 @@
             <button class="btn btn-ghost" id="btn-help-2" data-icon="help">操作教學</button>
             <button class="btn btn-ghost" id="btn-quality-2" data-icon="settings">畫質設定</button>
             <button id="btn-audio-pause" class="btn btn-ghost" data-audio-toggle>配樂</button>
+            <button class="btn btn-ghost hidden" id="btn-habitat-menu" data-icon="fish">海洋生物觀察站</button>
             <button class="btn btn-ghost" id="btn-restart-2" data-icon="restart">重新探索</button>
             <button class="btn btn-ghost" id="btn-home" data-icon="home">回到首頁</button>
           </div>
@@ -160,6 +184,7 @@
                 <li><span><kbd>Q</kbd> / <kbd>E</kbd></span>下降 / 上升</li>
                 <li><span><kbd>Shift</kbd></span>加速</li>
                 <li><span><kbd>F</kbd></span>與附近物件互動（準星對準目標）</li>
+                <li><span><kbd>B</kbd></span>完成任務後開啟生物觀察站</li>
                 <li><span><kbd>M</kbd></span>開啟或關閉配樂</li>
                 <li><span><kbd>ESC</kbd></span>退出滑鼠鎖定並開啟選單</li>
               </ul>
