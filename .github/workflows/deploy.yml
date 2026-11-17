@@ -1,0 +1,49 @@
+# 部署到 GitHub Pages
+# 1. 推送到 GitHub 後，到 Settings → Pages → Build and deployment，Source 選「GitHub Actions」。
+# 2. 推送到 main 分支（或手動執行此 workflow）即會自動建置並部署。
+# base 路徑會在建置時自動帶入儲存庫名稱（/<repo>/）；若使用自訂網域或 <user>.github.io 儲存庫，
+# 可在 Settings → Secrets and variables → Actions → Variables 新增 PAGES_BASE（例如 "/" 或 "./"）覆寫。
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build
+        run: npm run build
+        env:
+          VITE_BASE: ${{ vars.PAGES_BASE != '' && vars.PAGES_BASE || format('/{0}/', github.event.repository.name) }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,24 @@
+{
+  "name": "rachel-carson-ocean-mission",
+  "private": true,
+  "version": "1.0.0",
+  "description": "瑞秋卡森：海洋環境守護行動 — 《麥塊 AI 科學實驗王 2》補充單元 3D 海底探索教學網站",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit",
+    "preview": "vite preview --host --port 4173",
+    "test:e2e": "node tests/e2e.mjs"
+  },
+  "dependencies": {
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "@types/three": "^0.170.0",
+    "playwright": "^1.65.1",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}
