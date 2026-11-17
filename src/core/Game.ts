@@ -10,6 +10,7 @@ import { DIALOGUE } from '../data/dialogue';
 import { WORLD } from '../data/worldLayout';
 import { isTouchDevice, loadQuality, saveQuality, type QualityLevel } from './Quality';
 import { FpsMeter } from './FpsMeter';
+import { Ambience } from '../audio/Ambience';
 
 export type GameState = 'home' | 'intro' | 'playing' | 'card' | 'paused' | 'ended';
 
@@ -24,6 +25,7 @@ export class Game {
   readonly ui: GameUI;
   readonly touch: TouchControls;
   readonly fps = new FpsMeter();
+  private readonly ambience: Ambience;
   readonly isTouch: boolean;
   state: GameState = 'home';
 
@@ -46,10 +48,15 @@ export class Game {
     this.player = new PlayerController(this.ocean.camera, canvas);
     this.player.setColliders(this.ocean.terrain.colliders);
     this.player.reset();
+    this.ambience = new Ambience(() => this.ocean.camera.position);
 
     this.ui = new GameUI(
       {
-        onStart: () => this.startIntro(),
+        onStart: () => {
+          this.ambience.start();
+          this.startIntro();
+        },
+        onAudioToggle: () => this.toggleAudio(),
         onCardAction: (id) => this.cardAction(id),
         onCardClose: () => this.closeCard(),
         onRestart: () => this.restart(),
@@ -65,6 +72,7 @@ export class Game {
       this.isTouch,
     );
     this.ui.setQuality(quality);
+    this.ui.setAudio(this.ambience.muted, this.ambience.available);
     this.touch = new TouchControls(document.getElementById('touch-controls')!, this.player, () => this.tryInteract());
 
     // 互動目標
@@ -121,6 +129,7 @@ export class Game {
   // ---------------- 輸入 ----------------
   private bindInput(canvas: HTMLCanvasElement): void {
     window.addEventListener('keydown', (e) => {
+      if (e.code === 'KeyM' && !e.repeat && !e.ctrlKey && !e.altKey && !e.metaKey) this.toggleAudio();
       if (e.code === 'KeyF' && !e.repeat) {
         if (this.state === 'playing') this.tryInteract();
         else if (this.state === 'card') {
@@ -136,6 +145,7 @@ export class Game {
       if (e.code === 'Enter' && this.state === 'intro' && this.intro.t < 0) this.beginPlaying();
     });
     canvas.addEventListener('click', () => {
+      if (this.state === 'playing') this.ambience.start();
       if (this.state === 'playing' && !this.isTouch && !this.player.isPointerLocked) this.requestLock();
     });
     document.addEventListener('pointerlockchange', () => {
@@ -147,6 +157,11 @@ export class Game {
     document.addEventListener('pointerlockerror', () => {
       /* 某些環境（例如 iframe 或自動化測試）不允許鎖定滑鼠，改用拖曳轉視角 */
     });
+  }
+
+  private toggleAudio(): void {
+    this.ambience.toggle();
+    this.ui.setAudio(this.ambience.muted, this.ambience.available);
   }
 
   private requestLock(): void {

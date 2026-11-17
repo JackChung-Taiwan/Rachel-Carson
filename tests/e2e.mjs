@@ -116,7 +116,7 @@ const browser = await chromium.launch({ executablePath: CHROME, args: GL_ARGS })
   const btns = await page.$$eval('.home-buttons button', (b) => b.map((x) => x.textContent.trim()));
   record('首頁載入與文字', homeOk && title === '瑞秋卡森：海洋環境守護行動' && kicker === '《麥塊 AI 科學實驗王 2》補充單元' && en === 'Rachel Carson: Ocean Conservation Mission',
     { title, kicker, en });
-  record('首頁按鈕', JSON.stringify(btns) === JSON.stringify(['開始探索', '操作教學', '畫質設定']), btns);
+  record('首頁按鈕', JSON.stringify(btns) === JSON.stringify(['開始探索', '操作教學', '畫質設定', '配樂｜開啟']), btns);
   await sleep(2500);
   await page.screenshot({ path: OUT + 'home.png' });
 

@@ -143,6 +143,8 @@ body.pointer-locked #game-canvas { cursor: none; }
 @keyframes bump { 40% { transform: scale(1.12); color: #7dffb0; } }
 
 #btn-menu { position: absolute; top: calc(16px + var(--safe-top)); right: calc(16px + var(--safe-right)); }
+#btn-audio { position: absolute; top: calc(16px + var(--safe-top)); right: calc(78px + var(--safe-right)); }
+#btn-audio[aria-pressed="false"] { color: var(--muted); }
 #crosshair {
   position: absolute; left: 50%; top: 50%; width: 22px; height: 22px; transform: translate(-50%, -50%);
   pointer-events: none !important; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.75);
@@ -336,6 +338,7 @@ kbd {
   #mission-list li { font-size: 0.95rem; gap: 6px; }
   .m-title { display: none; }
   #mission-progress { margin-top: 6px; padding-top: 6px; font-size: 0.92rem; }
+  #btn-audio { width: 48px; height: 48px; top: calc(10px + var(--safe-top)); right: calc(64px + var(--safe-right)); }
   #btn-menu { width: 48px; height: 48px; top: calc(10px + var(--safe-top)); right: calc(10px + var(--safe-right)); }
   #toast { top: auto; bottom: calc(50% + 70px); font-size: 1rem; padding: 10px 16px; max-width: calc(100% - 24px); }
   .card-section p, .guide-text, .end-guide-text { font-size: 1.05rem; }
@@ -355,7 +358,7 @@ body.is-touch #guide-dialog.blocking { top: auto; bottom: calc(24px + var(--safe
 body.is-touch #lock-hint { display: none !important; }
 body.is-touch #interact-prompt { top: calc(50% + 40px); }
 @media (orientation: landscape) and (max-height: 520px) {
-  body.is-touch #guide-dialog { top: calc(10px + var(--safe-top)); left: auto; right: 74px; transform: none; width: min(460px, 52%); max-height: none; animation: none; }
+  body.is-touch #guide-dialog { top: calc(10px + var(--safe-top)); left: auto; right: calc(122px + var(--safe-right)); transform: none; width: min(460px, 52%); max-height: none; animation: none; }
   .modal { place-items: start center; }
   #joystick { width: 130px; height: 130px; }
 }

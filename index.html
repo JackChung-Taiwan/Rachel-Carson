@@ -31,6 +31,7 @@
             <button id="btn-start" class="btn btn-primary btn-xl" data-icon="play">開始探索</button>
             <button id="btn-help" class="btn btn-ghost" data-icon="help">操作教學</button>
             <button id="btn-quality" class="btn btn-ghost" data-icon="settings">畫質設定</button>
+            <button id="btn-audio-home" class="btn btn-ghost" data-audio-toggle>配樂</button>
           </div>
           <p class="home-note" id="home-quality-note"></p>
         </div>
@@ -45,6 +46,7 @@
           <div id="mission-progress">任務進度：0/5</div>
         </aside>
         <button id="btn-menu" class="icon-btn glass" aria-label="開啟選單" data-icon="menu"></button>
+        <button id="btn-audio" class="icon-btn glass" data-audio-toggle aria-label="海底配樂"></button>
         <div id="crosshair" aria-hidden="true"></div>
         <div id="target-marker" class="hidden" aria-hidden="true">
           <div class="tm-ring"></div>
@@ -138,6 +140,7 @@
             <button class="btn btn-primary btn-lg" id="btn-resume" data-icon="play">繼續探索</button>
             <button class="btn btn-ghost" id="btn-help-2" data-icon="help">操作教學</button>
             <button class="btn btn-ghost" id="btn-quality-2" data-icon="settings">畫質設定</button>
+            <button id="btn-audio-pause" class="btn btn-ghost" data-audio-toggle>配樂</button>
             <button class="btn btn-ghost" id="btn-restart-2" data-icon="restart">重新探索</button>
             <button class="btn btn-ghost" id="btn-home" data-icon="home">回到首頁</button>
           </div>
@@ -157,6 +160,7 @@
                 <li><span><kbd>Q</kbd> / <kbd>E</kbd></span>下降 / 上升</li>
                 <li><span><kbd>Shift</kbd></span>加速</li>
                 <li><span><kbd>F</kbd></span>與附近物件互動（準星對準目標）</li>
+                <li><span><kbd>M</kbd></span>開啟或關閉配樂</li>
                 <li><span><kbd>ESC</kbd></span>退出滑鼠鎖定並開啟選單</li>
               </ul>
             </section>
@@ -167,6 +171,7 @@
                 <li><span class="pill">右側滑動</span>旋轉視角</li>
                 <li><span class="pill">上升 / 下降</span>按住改變深度</li>
                 <li><span class="pill">互動</span>靠近目標後點一下</li>
+                <li><span class="pill">喇叭</span>開啟或關閉配樂</li>
               </ul>
             </section>
           </div>

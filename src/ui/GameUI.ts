@@ -12,6 +12,7 @@ const $ = <T extends HTMLElement = HTMLElement>(sel: string, root: ParentNode = 
 
 export interface UIHandlers {
   onStart: () => void;
+  onAudioToggle: () => void;
   onCardAction: (id: KnowledgeId) => void;
   onCardClose: () => void;
   onRestart: () => void;
@@ -56,6 +57,9 @@ export class GameUI {
     document.querySelectorAll<HTMLElement>('.guide-avatar').forEach((el) => (el.innerHTML = GUIDE_AVATAR_SVG));
 
     $('#btn-start').addEventListener('click', () => this.h.onStart());
+    document.querySelectorAll<HTMLButtonElement>('[data-audio-toggle]').forEach((button) => {
+      button.addEventListener('click', () => this.h.onAudioToggle());
+    });
     $('#btn-help').addEventListener('click', () => this.openModal('#help-modal', 'home'));
     $('#btn-quality').addEventListener('click', () => this.openModal('#quality-modal', 'home'));
     $('#btn-help-2').addEventListener('click', () => this.openModal('#help-modal', 'pause'));
@@ -206,6 +210,19 @@ export class GameUI {
     const f = $('#fps');
     f.classList.toggle('hidden', text === null);
     if (text) f.textContent = text;
+  }
+
+  setAudio(muted: boolean, available: boolean): void {
+    const enabled = available && !muted;
+    const label = !available ? '配樂無法使用' : muted ? '開啟配樂' : '關閉配樂';
+    document.querySelectorAll<HTMLButtonElement>('[data-audio-toggle]').forEach((button) => {
+      button.disabled = !available;
+      button.title = label;
+      button.setAttribute('aria-label', '海底配樂');
+      button.setAttribute('aria-pressed', String(enabled));
+      const text = button.classList.contains('icon-btn') ? '' : `配樂｜${enabled ? '開啟' : available ? '靜音' : '無法使用'}`;
+      button.innerHTML = ICONS[enabled ? 'speaker' : 'muted'] + text;
+    });
   }
 
   // ---------- 知識卡 ----------

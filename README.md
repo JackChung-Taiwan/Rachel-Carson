@@ -44,6 +44,7 @@ npm run preview    # 預覽建置結果 http://localhost:4173/
 | 下降／上升 | `Q` / `E` | 「下降」/「上升」按鈕 |
 | 加速 | `Shift` | 搖桿推到底 |
 | 互動 | `F`（準星對準目標） | 「互動」按鈕 |
+| 配樂 | `M` 或喇叭按鈕 | 喇叭按鈕 |
 | 選單 | `ESC`（退出滑鼠鎖定並開啟選單） | 右上角選單按鈕 |
 
 互動偵測會從畫面中央的準星發出射線（ray-sphere）。如果沒有對準任何物件，靠得夠近也能互動，比較適合低年級學生和手機操作。畫面上的青色圓圈和距離（例如「海龜 18 公尺」）會指出目前任務目標的方向。
@@ -191,12 +192,13 @@ npm run test:e2e                     # 需先安裝 Playwright 瀏覽器：npx p
 - 尚未在實體 iPhone / iPad（Safari）及 Android 手機上測試，觸控是用 Chrome 行動裝置模擬加 CDP 觸控事件驗證。
 - 海龜沿固定橢圓路徑游動，不是生態模擬；魚群是簡化的群游演算法。
 - 碰撞使用地形高度加上岩石球體近似，植物可以穿過。
-- 不含音效。
+- 海底配樂在點擊「開始探索」後播放。可切換靜音，設定會保存在同一瀏覽器。背景分頁會暫停配樂。
 
 ## 授權與參考
 
 - 本專案程式碼為原創撰寫。
 - 視覺方向參考 [Abyssal Garden](https://github.com/noniv/abyssal-garden)（© 2026 Maksymilian Dendura，**MIT License**），包括水色漸層、霧化、光束、caustics、海帶森林、微粒等呈現方式。原作使用 WebGPU 與 WGSL，本專案改用 Three.js / WebGL 與 GLSL 重新設計與實作，沒有複製原作程式碼。
+- 海底配樂取自 [Abyssal Garden 音景原始碼](https://github.com/noniv/abyssal-garden/blob/a596354eff400d458bc2aeb9bdf5e0a9734b2bcf/source/src/audio.js)，© 2026 Maksymilian Dendura，依 [MIT 授權](public/licenses/abyssal-garden.txt) 改編。改用本遊戲的相機位置、音量與靜音控制，使用瀏覽器即時合成。
 - 依賴套件：three（MIT）、vite（MIT）、typescript（Apache-2.0）。
 
 - [NOAA：廢棄漁具與生物纏繞](https://marinedebris.noaa.gov/what-marine-debris/derelict-fishing-gear)
