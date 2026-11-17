@@ -12,6 +12,7 @@ import { Vegetation } from './Vegetation';
 import { SeaLife } from './SeaLife';
 import { Turtle } from './Turtle';
 import { PlasticBottle } from './PlasticBottle';
+import { ConservationSites } from './ConservationSites';
 import { CleanupEffect } from './CleanupEffect';
 
 /**
@@ -24,6 +25,7 @@ export class OceanScene {
   readonly terrain: SeabedTerrain;
   readonly turtle: Turtle;
   readonly bottle: PlasticBottle;
+  readonly conservation = new ConservationSites();
   readonly cleanupEffect = new CleanupEffect();
   quality: QualitySettings;
 
@@ -61,7 +63,7 @@ export class OceanScene {
     this.scene.add(this.turtle.group);
     this.bottle = new PlasticBottle();
     this.scene.add(this.bottle.group);
-    this.scene.add(this.cleanupEffect.group);
+    this.scene.add(this.cleanupEffect.group, this.conservation.group);
 
     this.buildQualityDependent();
     this.resize();

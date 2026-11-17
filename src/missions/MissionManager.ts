@@ -1,6 +1,6 @@
 import type { KnowledgeId } from '../data/knowledge';
 
-export type MissionId = 'observe-turtle' | 'clean-plastic';
+export type MissionId = 'observe-turtle' | 'clean-plastic' | 'report-net' | 'survey-coral' | 'protect-seagrass';
 
 export interface Mission {
   id: MissionId;
@@ -28,6 +28,9 @@ export class MissionManager {
     return [
       { id: 'observe-turtle', label: '觀察海龜', title: '海洋生物觀察員', target: 'turtle', completed: false },
       { id: 'clean-plastic', label: '調查海洋垃圾', title: '海洋污染調查員', target: 'plastic-bottle', completed: false },
+      { id: 'report-net', label: '通報廢棄漁網', title: '廢棄漁網通報員', target: 'ghost-net', completed: false },
+      { id: 'survey-coral', label: '辨識珊瑚白化', title: '珊瑚白化觀察員', target: 'coral-survey', completed: false },
+      { id: 'protect-seagrass', label: '守護海草棲地', title: '海草棲地守護員', target: 'seagrass-bed', completed: false },
     ];
   }
 

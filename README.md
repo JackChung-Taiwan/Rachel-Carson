@@ -2,7 +2,7 @@
 
 **Rachel Carson: Ocean Conservation Mission**：《麥塊 AI 科學實驗王 2》補充單元，MVP V1.0
 
-這是一個在瀏覽器中執行的 3D 海底探索教學遊戲，適合國小三年級到國中學生。學生可以在程序化生成的海底世界自由游動，跟著「瑞秋卡森」導覽角色完成兩個科學任務：觀察海龜、調查並清理海洋塑膠垃圾。
+這是一個在瀏覽器中執行的 3D 海底探索教學遊戲，適合國小三年級到國中學生。學生可以在程序化生成的海底世界自由游動，跟著「瑞秋卡森」導覽角色完成五項科學任務：觀察海龜、清理塑膠瓶、通報廢棄漁網、辨識珊瑚白化與守護海草棲地。
 
 - 技術：Three.js（WebGLRenderer）＋ TypeScript ＋ Vite，搭配 HTML / CSS
 - 場景、生物、植物全部由程式即時生成，不使用外部 3D 模型或貼圖檔
@@ -54,8 +54,11 @@ npm run preview    # 預覽建置結果 http://localhost:4173/
 
 | # | 任務名稱 | 面板項目 | 完成條件 |
 |---|---|---|---|
-| 1 | 海洋生物觀察員 | 觀察海龜 | 找到海龜 → 按 F／互動打開知識卡 → 按「完成觀察」→ 進度 1/2 |
-| 2 | 海洋污染調查員 | 調查海洋垃圾 | 找到珊瑚旁沙地上的塑膠瓶 → 打開知識卡 → 按「清理垃圾」→ 塑膠瓶消失並出現清理特效 → 進度 2/2 → 出現恭喜提示 → 顯示結束畫面 |
+| 1 | 海洋生物觀察員 | 觀察海龜 | 找到海龜 → 按 F／互動打開知識卡 → 按「完成觀察」→ 進度 1/5 |
+| 2 | 海洋污染調查員 | 調查海洋垃圾 | 找到珊瑚旁沙地上的塑膠瓶 → 打開知識卡 → 按「清理垃圾」→ 塑膠瓶消失並出現清理特效 → 進度 2/5 |
+| 3 | 廢棄漁網通報員 | 通報廢棄漁網 | 找到漁網 → 標記位置並通報 → 進度 3/5 |
+| 4 | 珊瑚白化觀察員 | 辨識珊瑚白化 | 比較兩株珊瑚 → 判斷白化原因 → 提交觀察 → 進度 4/5 |
+| 5 | 海草棲地守護員 | 守護海草棲地 | 找到海草床 → 選擇合適的停船方式 → 標記保護區 → 進度 5/5、顯示結束畫面 |
 
 結束畫面有兩個按鈕：「重新探索」會重置任務並放回塑膠瓶，「繼續自由探索」會關閉結束畫面，讓學生繼續逛海底。
 
@@ -195,3 +198,7 @@ npm run test:e2e                     # 需先安裝 Playwright 瀏覽器：npx p
 - 本專案程式碼為原創撰寫。
 - 視覺方向參考 [Abyssal Garden](https://github.com/noniv/abyssal-garden)（© 2026 Maksymilian Dendura，**MIT License**），包括水色漸層、霧化、光束、caustics、海帶森林、微粒等呈現方式。原作使用 WebGPU 與 WGSL，本專案改用 Three.js / WebGL 與 GLSL 重新設計與實作，沒有複製原作程式碼。
 - 依賴套件：three（MIT）、vite（MIT）、typescript（Apache-2.0）。
+
+- [NOAA：廢棄漁具與生物纏繞](https://marinedebris.noaa.gov/what-marine-debris/derelict-fishing-gear)
+- [NOAA：珊瑚白化](https://oceanservice.noaa.gov/facts/coral_bleach.html)
+- [NOAA：海草與船隻傷害](https://floridakeys.noaa.gov/about/faqs.html)

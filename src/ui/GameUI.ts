@@ -213,10 +213,32 @@ export class GameUI {
     $('.card-science-text', c).textContent = entry.science;
     const action = $<HTMLButtonElement>('#card-action');
     action.textContent = completed ? entry.doneLabel : entry.actionLabel;
-    action.disabled = completed;
+    const question = entry.question;
+    action.disabled = completed || !!question;
+    const choices = $('#card-choices');
+    const feedback = $('#card-feedback');
+    choices.replaceChildren();
+    feedback.textContent = '';
+    $('#card-question').classList.toggle('hidden', !question || completed);
+    if (question && !completed) {
+      $('#card-question-title').textContent = question.text;
+      question.options.forEach((option, index) => {
+        const choice = document.createElement('button');
+        choice.type = 'button';
+        choice.className = 'btn btn-ghost';
+        choice.textContent = option.text;
+        choice.dataset.choice = String(index);
+        choice.addEventListener('click', () => {
+          choices.querySelectorAll('button').forEach((btn) => btn.setAttribute('aria-pressed', String(btn === choice)));
+          feedback.textContent = option.feedback;
+          action.disabled = !option.correct;
+        });
+        choices.append(choice);
+      });
+    }
     $('#card-close').textContent = completed ? '關閉' : '稍後再看';
     $('#card-overlay').classList.remove('hidden');
-    window.setTimeout(() => (completed ? $('#card-close') : action).focus(), 50);
+    window.setTimeout(() => (completed ? $('#card-close') : choices.querySelector('button') ?? action).focus(), 50);
   }
 
   hideCard(): void {

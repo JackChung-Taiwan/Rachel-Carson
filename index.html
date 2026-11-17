@@ -42,7 +42,7 @@
         <aside id="mission-panel" class="glass" aria-live="polite">
           <h2>海洋守護任務</h2>
           <ul id="mission-list"></ul>
-          <div id="mission-progress">任務進度：0/2</div>
+          <div id="mission-progress">任務進度：0/5</div>
         </aside>
         <button id="btn-menu" class="icon-btn glass" aria-label="開啟選單" data-icon="menu"></button>
         <div id="crosshair" aria-hidden="true"></div>
@@ -96,6 +96,11 @@
           <section class="card-section card-science">
             <h3>科學知識</h3>
             <p class="card-science-text"></p>
+          </section>
+          <section id="card-question" class="card-section hidden" aria-labelledby="card-question-title">
+            <h3 id="card-question-title"></h3>
+            <div id="card-choices"></div>
+            <p id="card-feedback" role="status"></p>
           </section>
           <footer class="card-actions">
             <button class="btn btn-ghost" id="card-close">稍後再看</button>

@@ -4,10 +4,12 @@
  * 環境變數：URL（預設 http://localhost:4173/）、CHROME（Chrome 執行檔路徑，未設定則用 Playwright 內建 Chromium）
  */
 import { chromium } from 'playwright';
+import { fileURLToPath } from 'node:url';
+import { resolve, sep } from 'node:path';
 import { mkdirSync, writeFileSync, existsSync } from 'node:fs';
 
 const BASE = process.env.URL || 'http://localhost:4173/';
-const OUT = new URL('../screenshots/', import.meta.url).pathname;
+const OUT = process.env.SCREENSHOTS_DIR ? resolve(process.env.SCREENSHOTS_DIR) + sep : fileURLToPath(new URL('../screenshots/', import.meta.url));
 mkdirSync(OUT, { recursive: true });
 const CHROME = process.env.CHROME || (existsSync('/usr/bin/google-chrome') ? '/usr/bin/google-chrome' : undefined);
 const GL_ARGS = ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'];
@@ -44,6 +46,32 @@ async function holdKey(page, key, ms) {
   await page.keyboard.down(key);
   await sleep(ms);
   await page.keyboard.up(key);
+}
+async function completeConservationSites(page, mobile = false) {
+  const sites = [
+    { id: 'ghost-net', name: '廢棄漁網' },
+    { id: 'coral-survey', name: '珊瑚觀測點', wrong: 1, right: 0 },
+    { id: 'seagrass-bed', name: '海草床', wrong: 0, right: 1 },
+  ];
+  for (const [index, site] of sites.entries()) {
+    await page.evaluate((id) => window.__oceanDebug.teleport(id), site.id);
+    await page.waitForFunction((id) => window.__oceanDebug.currentTarget() === id, site.id);
+    if (mobile) await page.tap('#btn-interact');
+    else await page.keyboard.press('f');
+    await page.locator('#card-name').getByText(site.name, { exact: true }).waitFor();
+    const action = page.locator('#card-action');
+    const press = async (locator) => mobile ? locator.tap() : locator.click();
+    let retryVerified = true;
+    if (site.wrong !== undefined) {
+      await press(page.locator(`[data-choice="${site.wrong}"]`));
+      retryVerified = await action.isDisabled() && !!(await page.textContent('#card-feedback'));
+      await press(page.locator(`[data-choice="${site.right}"]`));
+    }
+    await press(action);
+    const progress = await page.textContent('#mission-progress');
+    const recorded = await page.evaluate(() => window.__oceanDebug.recordedSites());
+    record(`${mobile ? '手機' : '桌機'}：${site.name}`, retryVerified && recorded.includes(site.id) && progress === `任務進度：${index + 3}/5`, { progress, recorded });
+  }
 }
 async function measureFps(page, seconds = 5) {
   return page.evaluate(
@@ -113,7 +141,7 @@ const browser = await chromium.launch({ executablePath: CHROME, args: GL_ARGS })
   await page.click('#guide-dialog .btn-primary');
   const playing = await waitFor(page, () => window.__oceanDebug.state() === 'playing');
   const panel = await page.innerText('#mission-panel');
-  record('進入遊戲狀態與任務面板 0/2', playing && panel.includes('海洋守護任務') && panel.includes('[ ]') && panel.includes('任務進度：0/2'), panel.replace(/\n/g, ' | '));
+  record('進入遊戲狀態與任務面板 0/5', playing && panel.includes('海洋守護任務') && panel.includes('[ ]') && panel.includes('任務進度：0/5'), panel.replace(/\n/g, ' | '));
   await page.evaluate(() => document.querySelector('#guide-dialog').classList.add('hidden'));
   await sleep(3000);
   await page.screenshot({ path: OUT + 'explore.png' });
@@ -221,7 +249,7 @@ const browser = await chromium.launch({ executablePath: CHROME, args: GL_ARGS })
   await sleep(500);
   const prog1 = await page.textContent('#mission-progress');
   const panel1 = await page.innerText('#mission-list');
-  record('完成觀察 → 任務進度 1/2', prog1 === '任務進度：1/2' && panel1.includes('[✓]') && (await dbg(page, () => window.__oceanDebug.progress())) === '1/2', { prog1, panel: panel1.replace(/\n/g, ' | ') });
+  record('完成觀察 → 任務進度 1/5', prog1 === '任務進度：1/5' && panel1.includes('[✓]') && (await dbg(page, () => window.__oceanDebug.progress())) === '1/5', { prog1, panel: panel1.replace(/\n/g, ' | ') });
   await page.screenshot({ path: OUT + 'progress-1of2.png' });
 
   // 任務 2：塑膠瓶
@@ -254,8 +282,9 @@ const browser = await chromium.launch({ executablePath: CHROME, args: GL_ARGS })
   await sleep(900);
   const bottleGone = !(await dbg(page, () => window.__oceanDebug.bottleVisible()));
   const panel2 = await page.innerText('#mission-list');
-  record('清理垃圾 → 瓶子消失、清理特效、2/2', bottleGone && prog2 === '任務進度：2/2' && (panel2.match(/\[✓\]/g) || []).length === 2 && toast.includes('清理完成'),
+  record('清理垃圾 → 瓶子消失、清理特效、2/5', bottleGone && prog2 === '任務進度：2/5' && (panel2.match(/\[✓\]/g) || []).length === 2 && toast.includes('清理完成'),
     { bottleGone, prog2, toast, panel: panel2.replace(/\n/g, ' | ') });
+  await completeConservationSites(page);
   const celebrate = await waitFor(page, () => document.querySelector('#toast')?.textContent.includes('恭喜'), 4000);
   record('恭喜完成提示', celebrate, await page.textContent('#toast'));
   const ended = await waitFor(page, () => !document.querySelector('#end-screen').classList.contains('hidden'), 8000);
@@ -281,14 +310,14 @@ const browser = await chromium.launch({ executablePath: CHROME, args: GL_ARGS })
   const resetProg = await page.textContent('#mission-progress');
   const bottleBack = await dbg(page, () => window.__oceanDebug.bottleVisible());
   const st = await dbg(page, () => window.__oceanDebug.state());
-  record('重新探索（重置任務與塑膠瓶）', resetProg === '任務進度：0/2' && bottleBack && st === 'intro', { resetProg, bottleBack, state: st });
+  record('重新探索（重置任務與塑膠瓶）', resetProg === '任務進度：0/5' && bottleBack && st === 'intro', { resetProg, bottleBack, state: st });
   // 結束畫面的「重新探索」按鈕
   await page.click('#guide-dialog .btn-primary');
   await page.evaluate(() => { const d = window.__oceanDebug; d.completeAll(); });
   const ended2 = await waitFor(page, () => !document.querySelector('#end-screen').classList.contains('hidden'), 8000);
   await page.click('#btn-restart');
   await sleep(500);
-  record('結束畫面「重新探索」按鈕', ended2 && (await page.textContent('#mission-progress')) === '任務進度：0/2', { ended2 });
+  record('結束畫面「重新探索」按鈕', ended2 && (await page.textContent('#mission-progress')) === '任務進度：0/5', { ended2 });
 
   // 畫質切換
   await page.click('#guide-dialog .btn-primary');
@@ -407,16 +436,17 @@ const perf = {};
   await page.screenshot({ path: OUT + 'mobile-card.png' });
   await page.tap('#card-action');
   await sleep(500);
-  record('手機：互動按鈕開啟知識卡並完成任務', mcard && (await page.textContent('#mission-progress')) === '任務進度：1/2', { cardOpened: mcard, progress: await page.textContent('#mission-progress') });
+  record('手機：互動按鈕開啟知識卡並完成任務', mcard && (await page.textContent('#mission-progress')) === '任務進度：1/5', { cardOpened: mcard, progress: await page.textContent('#mission-progress') });
   await page.evaluate(() => window.__oceanDebug.teleport('bottle'));
   await sleep(800);
   await page.tap('#btn-interact');
   await sleep(600);
   await page.tap('#card-action');
+  await completeConservationSites(page, true);
   await waitFor(page, () => !document.querySelector('#end-screen').classList.contains('hidden'), 8000);
   await sleep(800);
   await page.screenshot({ path: OUT + 'mobile-complete.png' });
-  record('手機：完成兩項任務與結束畫面', await page.isVisible('#end-screen'), { progress: await page.textContent('#mission-progress') });
+  record('手機：完成五項任務與結束畫面', await page.isVisible('#end-screen'), { progress: await page.textContent('#mission-progress') });
   perf.mobile_low_390x844_dpr2 = await (async () => {
     await page.tap('#btn-free');
     await sleep(1500);

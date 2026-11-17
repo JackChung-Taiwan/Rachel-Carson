@@ -86,6 +86,17 @@ export class Game {
       isEnabled: () => !bottle.cleaned,
     });
 
+    for (const site of this.ocean.conservation.entries) {
+      this.interactions.register({
+        id: site.id,
+        center: site.center,
+        radius: 1.7,
+        rayRange: 9,
+        proximity: 4,
+        isEnabled: () => this.missions.current?.target === site.id,
+      });
+    }
+
     this.missions.onChange((list) => this.ui.renderMissions(list, this.missions.progressText));
     this.missions.onAllCompleted(() => {
       this.endTimer = window.setTimeout(() => this.showEnd(), 2600);
@@ -233,6 +244,14 @@ export class Game {
       this.closeCard();
       this.ui.toast(`清理完成！塑膠瓶已從海底移除　${this.missions.progressText}`, 3000);
       if (!this.missions.allCompleted) this.ui.showDialog(DIALOGUE.afterBottle, { autoHideMs: 9000 });
+    } else {
+      const mission = this.missions.current;
+      if (!mission || mission.target !== id || !this.missions.complete(mission.id)) return;
+      this.ocean.conservation.record(id);
+      this.closeCard();
+      this.ui.toast(`任務完成：${mission.title}　${this.missions.progressText}`, 3000);
+      const nextHint = id === 'ghost-net' ? DIALOGUE.afterNet : id === 'coral-survey' ? DIALOGUE.afterCoral : null;
+      if (nextHint) this.ui.showDialog(nextHint, { autoHideMs: 10500 });
     }
     if (this.missions.allCompleted) {
       this.ui.hideDialog();
@@ -270,6 +289,7 @@ export class Game {
     this.ui.showPause(false);
     this.missions.reset();
     this.ocean.bottle.reset();
+    this.ocean.conservation.reset();
     this.ocean.turtle.setPaused(false);
     this.touch.setVisible(false);
     this.ui.showHUD(true);
@@ -310,6 +330,7 @@ export class Game {
     this.touch.setVisible(false);
     this.missions.reset();
     this.ocean.bottle.reset();
+    this.ocean.conservation.reset();
     this.player.enabled = false;
     this.state = 'home';
     this.ui.showHome(true);
@@ -416,12 +437,12 @@ export class Game {
   }
 
   // ---------------- 除錯 / 自動化測試 ----------------
-  debugTeleport(target: 'turtle' | 'bottle' | 'start'): void {
+  debugTeleport(target: KnowledgeId | 'bottle' | 'start'): void {
     if (target === 'start') {
       this.player.reset();
       return;
     }
-    const it = this.interactions.get(target === 'turtle' ? 'turtle' : 'plastic-bottle')!;
+    const it = this.interactions.get(target === 'bottle' ? 'plastic-bottle' : target)!;
     const c = it.center;
     const from = this.tmpV.copy(this.ocean.camera.position).sub(c).setY(0);
     if (from.lengthSq() < 1e-3) from.set(0, 0, 1);

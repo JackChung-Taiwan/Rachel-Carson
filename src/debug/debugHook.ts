@@ -1,3 +1,4 @@
+import type { KnowledgeId } from '../data/knowledge';
 import type { Game } from '../core/Game';
 import * as THREE from 'three';
 import type { QualityLevel } from '../core/Quality';
@@ -16,8 +17,9 @@ function createDebugApi(game: Game) {
     progress: () => `${game.missions.completedCount}/${game.missions.total}`,
     missions: () => game.missions.list.map((m) => ({ id: m.id, completed: m.completed })),
     currentTarget: () => game.interactions.current?.id ?? null,
+    recordedSites: () => game.ocean.conservation.entries.filter(({ beacon }) => beacon.visible).map(({ id }) => id),
     bottleVisible: () => game.ocean.bottle.group.visible && !game.ocean.bottle.cleaned,
-    teleport: (t: 'turtle' | 'bottle' | 'start') => game.debugTeleport(t),
+    teleport: (t: KnowledgeId | 'bottle' | 'start') => game.debugTeleport(t),
     interact: () => game.tryInteract(),
     playerPosition: () => game.player.position.toArray().map((v) => +v.toFixed(2)),
     view: () => ({ yaw: +game.player.yaw.toFixed(3), pitch: +game.player.pitch.toFixed(3) }),
@@ -30,8 +32,10 @@ function createDebugApi(game: Game) {
     teleportRaw: (x: number, y: number, z: number) => game.player.teleport(new THREE.Vector3(x, y, z)),
     /** 直接完成所有任務（測試結束畫面用） */
     completeAll: () => {
-      game.missions.complete('observe-turtle');
-      game.missions.complete('clean-plastic');
+      for (const mission of game.missions.list) {
+        game.missions.complete(mission.id);
+        game.ocean.conservation.record(mission.target);
+      }
       game.ocean.bottle.clean();
     },
     look: (yaw: number, pitch: number) => {

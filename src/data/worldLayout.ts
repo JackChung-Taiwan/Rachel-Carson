@@ -2,6 +2,13 @@
  * 海底世界的配置資料（座標單位：公尺，海面 y = 0）。
  * 要新增景點或任務目標時，從這裡調整即可。
  */
+export const SITE_POSITIONS = {
+  'ghost-net': { x: 21, z: -6 },
+  'coral-survey': { x: 6, z: -21 },
+  'seagrass-bed': { x: -10, z: -30 },
+} as const;
+export type SiteId = keyof typeof SITE_POSITIONS;
+
 export const WORLD = {
   /** 可游動範圍半徑 */
   boundsRadius: 100,
@@ -32,6 +39,7 @@ export const WORLD = {
   ],
   /** 不放置大型植物/岩石的區域（起點、海龜路徑、垃圾、拱門通道） */
   clearZones: [
+    ...Object.values(SITE_POSITIONS).map((point) => ({ ...point, r: 4.4 })),
     { x: 0, z: 34, r: 7 },
     { x: 1, z: 13, r: 12 },
     { x: 15.5, z: 6.5, r: 3.2 },
